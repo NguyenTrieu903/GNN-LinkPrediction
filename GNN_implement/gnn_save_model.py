@@ -313,8 +313,52 @@ def predict_test_data(model, X_test, D_inverse_test, A_tilde_test, Y_test, nodes
         print("After auc is %f." % (metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))))
     return test_acc, scores
 
-def predict():
-    pass
+def predict(model, X_test, A_tilde_test, D_inverse_test, nodes_size_list_test):
+    pre_y = model.pre_y
+    # Y_pl = model.Y_pl
+    pos_score = model.pos_score
+
+    test_acc, prediction, scores = 0, [], []
+
+    with tf.Session() as sess:
+        # load model
+        sess.run(tf.global_variables_initializer())
+        saver = tf.train.import_meta_graph('model-1000.meta')
+        saver.restore(sess,tf.train.latest_checkpoint('./'))
+        graph = tf.get_default_graph()
+
+        # get paramaters
+        X_pl = graph.get_tensor_by_name("X_pl:0")
+        A_tilde_pl = graph.get_tensor_by_name("A_tilde_pl:0")
+        D_inverse_pl = graph.get_tensor_by_name("D_inverse_pl:0")
+        is_train = graph.get_tensor_by_name("is-train-or-test:0")
+        node_size_pl = graph.get_tensor_by_name("node-size-placeholder:0")
+        weight_1 = graph.get_tensor_by_name("weight_1:0")
+        weight_2 = graph.get_tensor_by_name("weight_2:0")
+        bias_1 = graph.get_tensor_by_name("bias_1:0")
+        bias_2 = graph.get_tensor_by_name("bias_2:0")
+
+        graph_weight_1 = graph.get_tensor_by_name("graph_weight_1:0")
+        graph_weight_2 = graph.get_tensor_by_name("graph_weight_2:0")
+        graph_weight_3 = graph.get_tensor_by_name("graph_weight_3:0")
+        graph_weight_4 = graph.get_tensor_by_name("graph_weight_4:0")
+
+        weight_1_value, weight_2_value, bias_1_value, bias_2_value = sess.run([weight_1, weight_2, bias_1, bias_2])
+        graph_weight_1_value, graph_weight_2_value, graph_weight_3_value, graph_weight_4_value = sess.run([graph_weight_1, graph_weight_2, graph_weight_3, graph_weight_4])
+
+        
+        # saver = tf.train.Saver()
+        # saver.restore(sess, '/home/nhattrieu-machine/Documents/SEAL-for-link-prediction-master/model-1000.meta')  # Đường dẫn tới tệp tin đã lưu
+        print("Model restored.")
+        feed_dict = {X_pl: X_test, is_train: 0, A_tilde_pl: A_tilde_test, D_inverse_pl: D_inverse_test,  node_size_pl: nodes_size_list_test,
+                         weight_1:weight_1_value, weight_2:weight_2_value, bias_1:bias_1_value, bias_2:bias_2_value, graph_weight_1:graph_weight_1_value, 
+                         graph_weight_2: graph_weight_2_value, graph_weight_3 :graph_weight_3_value, graph_weight_4:graph_weight_4_value
+                         }
+        pre_y_value, pos_score_value = sess.run([pre_y, pos_score], feed_dict=feed_dict)
+        print("pos_score_value: ", pos_score_value)
+        prediction.append(np.argmax(pos_score_value, 1))
+        # scores.append(pos_score_value[0][1])
+    return prediction
 
 def test_demo(model, X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test):
     D_inverse_pl = model.D_inverse_pl

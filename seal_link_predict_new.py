@@ -14,7 +14,7 @@ import pandas as pd
 from GNN_implement import gnn_save_model, gnn_save_model_No2
 
 
-def load_data(data_name, network_type):
+def load_data(network_type):
     """
     :param data_name: 
     :param network_type: use 0 and 1 stands for undirected or directed graph, respectively
@@ -63,11 +63,13 @@ def learning_embedding(positive, negative, network_size, test_ratio, dimension, 
     train_posi, train_nega = positive[:-test_size], negative[:-test_size]
     # negative injection
     A = nx.Graph() if network_type == 0 else nx.DiGraph()
+    
     # So if train_posi is an array containing the edges of the graph, 
     # the line of code will add these edges to graph A and assign a weight of 1 to each edge.
     A.add_weighted_edges_from(np.concatenate([train_posi, np.ones(shape=[train_posi.shape[0], 1], dtype=np.int8)], axis=1))
     if negative_injection:
         A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
+    line_graph = nx.line_graph(A)
     # node2vec
     G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
     G.preprocess_transition_probs()
@@ -465,11 +467,84 @@ def create_input_for_gnn_fly(graphs_adj, labels, vertex_tags, node_size_list, su
     return np.array(D_inverse), graphs_adj, Y, X, node_size_list, initial_feature_channels  # ps, graph_adj is A_title
 
 
+def create_input_for_gnn_fly_node_pair(graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes,
+                             embedding_feature, explicit_feature, tags_size):
+    print("create input for gnn on fly, (skipping I/O operation)")
+    # graphs, nodes_size_list, labels = data["graphs"], data["nodes_size_list"], data["labels"]
+
+    # 1 - prepare Y
+    # dung de tao ma tran nhan Y trong do moi phan tu co gia tri 1 neu tuong ung voi mot canh co nhan 1, va co gia tri 0 neu tuong ung voi 1 canh co nhan 0
+    Y = np.where(np.reshape(labels, [-1, 1]) == 1, 1, 0)
+    print("positive examples: %d, negative examples: %d." % (np.sum(Y == 0), np.sum(Y == 1)))
+    # 2 - prepare A_title
+    # graphs_adj is A_title in the formular of Graph Convolution layer
+    # add eye to A_title
+    # code dung de them ma tran don vi vao moi ma tran ke. np.eye dung de tao ma tran don vi
+    for index, x in enumerate(graphs_adj):
+        graphs_adj[index] = x + np.eye(x.shape[0], dtype=np.uint8)
+    # 3 - prepare D_inverse
+    D_inverse = []
+    for x in graphs_adj:
+        # su dung de tinh ma tran nghich dao cua ma tran duong cheo. np.sum(x, axis=1) -> tinh tong moi hang cua ma tran
+        # np.diag -> tao mot ma tran duong cheo tu mang bang cach su dung np.diag()
+        # np.linalg.inv -> tinh ma tran nghich dao cua ma tran duong cheo nay. 
+        D_inverse.append(np.linalg.inv(np.diag(np.sum(x, axis=1))))
+    # 4 - prepare X
+    X, initial_feature_channels = [], 0
+
+    # Target: chuyen doi mot mang cac nhan lop thanh mot dang ma hoa one-hot. Một ma trận one-hot với mỗi hàng biểu diễn một nhãn lớp, 
+    # trong đó chỉ có một phần tử bằng 1 và tất cả các phần tử khác bằng 0
+    def convert_to_one_hot(y, C):
+        return np.eye(C, dtype=np.uint8)[y.reshape(-1)]
+    # vertex_tags la mot list cac nhan cac dinh trong do thi. Neu khac None thi chay qua cac vertex_tag va one_hot chung.
+    if vertex_tags is not None:
+        initial_feature_channels = tags_size
+        print("X: one-hot vertex tag, tag size %d." % initial_feature_channels)
+        for tag in vertex_tags:
+            x = convert_to_one_hot(np.array(tag), initial_feature_channels)
+            X.append(x)
+    # Nguoc lai se chuan hoa roi them vao mang X.
+    else:
+        print("X: normalized node degree.")
+        for graph in graphs_adj:
+            degree_total = np.sum(graph, axis=1)
+            X.append(np.divide(degree_total, np.sum(degree_total)).reshape(-1, 1))
+        initial_feature_channels = 1
+    X = np.array(X)
+    # doan code xay dung cac embedding features cho cac dinh trong do thi bang cach ket hop cac dac trung hien co voi cac dac trung nhung neu chung 
+    # co san.
+    if embedding_feature is not None:
+        # print("embedding feature has considered")
+        # # build embedding for enclosing sub-graph
+        # sub_graph_emb = []
+        # for sub_nodes in sub_graphs_nodes:
+        #     sub_graph_emb.append(embedding_feature[sub_nodes])
+        # for i in range(len(X)):
+        #     X[i] = np.concatenate([X[i], sub_graph_emb[i]], axis=1)
+        # # so luong kenh dac trung ban dau duoc cap nhat thanh so luong kenh dac trung dau tien trong X. 
+        # initial_feature_channels = len(X[0][0])
+        print("embedding feature has been considered")
+        print(len(sub_graphs_nodes))
+        # Build embedding for the node pair
+        node1_emb = embedding_feature[sub_graphs_nodes[0]]
+        node2_emb = embedding_feature[sub_graphs_nodes[1]]
+        
+        # Concatenate node embeddings with node features
+        X_node1 = np.concatenate([X[0], node1_emb], axis=1)
+        X_node2 = np.concatenate([X[1], node2_emb], axis=1)
+        # Update initial feature channels
+        initial_feature_channels = X_node1.shape[1]
+        # Update X with the concatenated embeddings
+        X = [X_node1, X_node2]
+    if explicit_feature is not None:
+        initial_feature_channels = len(X[0][0])
+        pass
+    print("so, initial feature channels: ", initial_feature_channels)
+    return np.array(D_inverse), graphs_adj, Y, X, node_size_list, initial_feature_channels  # ps, graph_adj is A_title
+
 def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate, top_k=60, epoch=100):
-    positive, negative, nodes_size = load_data(data_name, is_directed)
+    positive, negative, nodes_size = load_data(is_directed)
     embedding_feature = learning_embedding(positive, negative, nodes_size, test_ratio, dimension, is_directed)
-    print(embedding_feature[0])
-    print(embedding_feature[276])
     graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, tags_size = \
         link2subgraph(positive, negative, nodes_size, test_ratio, hop, is_directed)
 
@@ -478,43 +553,34 @@ def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate
     D_inverse_train, D_inverse_test, A_tilde_train, A_tilde_test, X_train, X_test, Y_train, Y_test, \
     nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
 
-    print("data set: ", data_name)
-    print("show configure for gnn.")
-    print("number of enclosing sub-graph is: ", len(graphs_adj))
-    print("size of vertices tags is: ", tags_size)
-    print("in all enclosing sub-graph, max nodes is %d, min nodes is %d, average node is %.2d." % (
-        np.max(node_size_list), np.min(node_size_list), np.average(node_size_list)))
-    
-    # test for split model
-    # auc = 0
     model = gnn_save_model.define_model(top_k, initial_feature_dimension, nodes_size_list_train, nodes_size_list_test, learning_rate,debug=False)
-    print(Y_test[1:5])
-    print(X_test[1])
     # gnn_save_model.train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, epoch)
-    test_acc, scores = gnn_save_model.predict_test_data(model, X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test)
-    auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))
-    print("auc: %f" % auc)
-    print("test_acc: %f" % test_acc)
-    
-    gnn_save_model_No2.train_demo(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, nodes_size_list_test, initial_feature_dimension, learning_rate, epoch, top_k, debug=False)
 
-    # origin
-    gnn_save_model.train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train,
-                     X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test,
-                     top_k, initial_feature_dimension, learning_rate, epoch)
-    test_acc, prediction, pos_scores = gnn.train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train,
-                     X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test,
-                     top_k, initial_feature_dimension, learning_rate, epoch)
-    auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(pos_scores))
-    print("auc: %f" % auc)
-    return auc
+    prediction = gnn_save_model.predict(model, X_test[0], A_tilde_test[0], D_inverse_test[0], nodes_size_list_test[0])
+    print("Probability for prediction is: ", prediction[0])
+    # auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))
+    # print("auc: %f" % auc)
+    # print("test_acc: %f" % test_acc)
+    
+    # gnn_save_model_No2.train_demo(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, nodes_size_list_test, initial_feature_dimension, learning_rate, epoch, top_k, debug=False)
+
+    # # origin
+    # gnn_save_model.train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train,
+    #                  X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test,
+    #                  top_k, initial_feature_dimension, learning_rate, epoch)
+    # test_acc, prediction, pos_scores = gnn.train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train,
+    #                  X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test,
+    #                  top_k, initial_feature_dimension, learning_rate, epoch)
+    # auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(pos_scores))
+    # print("auc: %f" % auc)
+    # return auc
 
 def classifier_for_node_pair(node_pair, data_name, is_directed, test_ratio, dimension, hop, learning_rate, top_k=60, epoch=100):
     positive, negative, nodes_size = load_data(data_name, is_directed)
     embedding_feature = learning_embedding(positive, negative, nodes_size, test_ratio, dimension, is_directed)
     graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, tags_size = \
         link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ratio, hop, is_directed)
-    print(vertex_tags)
+    print("link2subgraph_at_one_node: ",sub_graphs_nodes)
     # Find the index of the node pair in the subgraphs nodes list
     # print(len(sub_graphs_nodes[1]))
     # pair_index = sub_graphs_nodes.index(node_pair)
@@ -541,20 +607,21 @@ def classifier_for_node_pair(node_pair, data_name, is_directed, test_ratio, dime
     # con loi cho nay -> can khac phuc
     D_inverse, A_tilde, Y, X, nodes_size_list, initial_feature_dimension = create_input_for_gnn_fly(
         graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, embedding_feature, None, tags_size)
-    D_inverse_train, D_inverse_test, A_tilde_train, A_tilde_test, X_train, X_test, Y_train, Y_test, \
-    nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
+    print(X)
+    # D_inverse_train, D_inverse_test, A_tilde_train, A_tilde_test, X_train, X_test, Y_train, Y_test, \
+    # nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
 
-    # Train and evaluate the classifier
-    print("Data set:", data_name)
-    print("Show configuration for GNN.")
-    print("Number of enclosing sub-graphs:", len(graphs_adj))
-    print("Size of vertices tags:", tags_size)
-    print("In all enclosing sub-graphs, max nodes is %d, min nodes is %d, average node is %.2d." % (
-        np.max(node_size_list), np.min(node_size_list), np.average(node_size_list)))
+    # # Train and evaluate the classifier
+    # print("Data set:", data_name)
+    # print("Show configuration for GNN.")
+    # print("Number of enclosing sub-graphs:", len(graphs_adj))
+    # print("Size of vertices tags:", tags_size)
+    # print("In all enclosing sub-graphs, max nodes is %d, min nodes is %d, average node is %.2d." % (
+    #     np.max(node_size_list), np.min(node_size_list), np.average(node_size_list)))
 
-    model = gnn_save_model.define_model(top_k, initial_feature_dimension, nodes_size_list_train, nodes_size_list_test, learning_rate,debug=False)
-    # gnn_save_model.train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, epoch)
-    test_acc, scores = gnn_save_model.predict_test_data(model, X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test)
-    auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))
-    print("auc: %f" % auc)
-    print("test_acc: %f" % test_acc)
+    # model = gnn_save_model.define_model(top_k, initial_feature_dimension, nodes_size_list_train, nodes_size_list_test, learning_rate,debug=False)
+    # # gnn_save_model.train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, epoch)
+    # test_acc, scores = gnn_save_model.predict_test_data(model, X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test)
+    # auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))
+    # print("auc: %f" % auc)
+    # print("test_acc: %f" % test_acc)
