@@ -1,12 +1,27 @@
+# from sys import path
+# path.append(r'./GNN_implement/')
+# from GNN_implement.main import parse_args, gnn
+# from GNN_implement import gnn
+# path.append(r"./node2vec/src/")
+# import numpy as np
+# import networkx as nx
+# from sklearn import metrics
+# import node2vec
+# from gensim.models import Word2Vec
+# from operator import itemgetter
+# from tqdm import tqdm
+# import pandas as pd
+# from GNN_implement import gnn_save_model, gnn_save_model_No2
+
 from sys import path
 path.append(r'./GNN_implement/')
 from GNN_implement.main import parse_args, gnn
-from GNN_implement import gnn
-path.append(r"./node2vec/src/")
 import numpy as np
+from GNN_implement import gnn
+path.append(r"./mynode2vec/src")
 import networkx as nx
 from sklearn import metrics
-import node2vec
+from mynode2vec import Graph
 from gensim.models import Word2Vec
 from operator import itemgetter
 from tqdm import tqdm
@@ -71,7 +86,8 @@ def learning_embedding(positive, negative, network_size, test_ratio, dimension, 
         A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
     line_graph = nx.line_graph(A)
     # node2vec
-    G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    # G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    G = Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
     G.preprocess_transition_probs()
     walks = G.simulate_walks(num_walks=10, walk_length=80)
     walks = [list(map(str, walk)) for walk in walks]
@@ -113,7 +129,8 @@ def learning_embedding_at_node(positive, negative, network_size, test_ratio, dim
     if negative_injection:
         A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
     # node2vec
-    G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    # G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    G = Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
     G.preprocess_transition_probs()
     walks = G.simulate_walks(num_walks=10, walk_length=80)
     walks = [list(map(str, walk)) for walk in walks]
