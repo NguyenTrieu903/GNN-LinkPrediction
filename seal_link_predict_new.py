@@ -24,7 +24,7 @@ def load_data(network_type):
     # positive = np.loadtxt(file_path, dtype=int, usecols=(0, 1))
 
     print("load data...")
-    file_path = "./raw_data/fb-pages-food/fb-pages-food.csv"
+    file_path = "./raw_data/git_web_ml/musae_git_edges.csv"
     positive_df = pd.read_csv(file_path, delimiter=',', dtype=int)
     positive = positive_df.to_numpy()
 
