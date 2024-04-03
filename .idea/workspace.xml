@@ -4,37 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0dccabb6-c128-4582-9a12-d5087b78549f" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/SEAL_implement.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SEAL_implement.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="0dccabb6-c128-4582-9a12-d5087b78549f" name="Default" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LogisticRegression_Linkprediction/feature_extraction.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogisticRegression_Linkprediction/feature_extraction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LogisticRegression_Linkprediction/link_prediction.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogisticRegression_Linkprediction/link_prediction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LogisticRegression_Linkprediction/understanding_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogisticRegression_Linkprediction/understanding_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model-1000.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/model-1000.data-00000-of-00001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model-1000.index" beforeDir="false" afterPath="$PROJECT_DIR$/model-1000.index" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model-1000.meta" beforeDir="false" afterPath="$PROJECT_DIR$/model-1000.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/LICENSE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/emb/karate.emb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/emb/karate.emd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/graph/karate.edgelist" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/resources/log4j2.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/scala/com/navercorp/Main.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/scala/com/navercorp/Node2vec.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/scala/com/navercorp/Word2vec.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/scala/com/navercorp/graph/GraphOps.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/scala/com/navercorp/graph/package.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/node2vec_spark/src/main/scala/com/navercorp/lib/AbstractParams.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/requirements.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/setup.cfg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/src/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/src/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mynode2vec/src/mynode2vec.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/seal_link_predict_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/seal_link_predict_new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/seal_link_predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/seal_link_predict.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -324,6 +296,15 @@
       <option name="presentableId" value="Default" />
       <updated>1544581041548</updated>
     </task>
+    <task id="LOCAL-00001" summary="update">
+      <option name="closed" value="true" />
+      <created>1712154662535</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1712154662535</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -354,6 +335,10 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

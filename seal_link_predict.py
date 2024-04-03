@@ -40,8 +40,6 @@ def load_data(data_name, network_type):
     if np.min(positive) == 1:
         positive -= 1
         negative -= 1
-    # print(positive)
-    # print(negative)
     return positive, negative, len(G.nodes())
 
 
