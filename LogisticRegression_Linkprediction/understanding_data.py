@@ -26,16 +26,14 @@ def load_data():
 
     return fb_df, node_list_1, node_list_2
 
-def plot_graph(fb_df):
-  
-  # create graph
-  G = nx.from_pandas_edgelist(fb_df, "node_1", "node_2", create_using=nx.Graph())
+def create_graph(fb_df):
+    G = nx.from_pandas_edgelist(fb_df, "node_1", "node_2", create_using=nx.Graph())
+    return G
 
-  # plot graph
+def plot_graph(G):
   plt.figure(figsize=(10,10))
   
   pos = nx.random_layout(G, np.random.seed(23))
   nx.draw(G, with_labels=False,  pos = pos, node_size = 40, alpha = 0.6, width = 0.7)
 
   plt.show()
-  return G

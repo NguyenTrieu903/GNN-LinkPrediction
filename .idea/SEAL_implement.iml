@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/GNN-tf" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/GNN_implement" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.5.2 (D:\Software_robin\ada\python.exe)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="seal" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">

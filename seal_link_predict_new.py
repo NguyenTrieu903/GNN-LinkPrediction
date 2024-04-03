@@ -1,33 +1,17 @@
-# from sys import path
-# path.append(r'./GNN_implement/')
-# from GNN_implement.main import parse_args, gnn
-# from GNN_implement import gnn
-# path.append(r"./node2vec/src/")
-# import numpy as np
-# import networkx as nx
-# from sklearn import metrics
-# import node2vec
-# from gensim.models import Word2Vec
-# from operator import itemgetter
-# from tqdm import tqdm
-# import pandas as pd
-# from GNN_implement import gnn_save_model, gnn_save_model_No2
-
 from sys import path
 path.append(r'./GNN_implement/')
 from GNN_implement.main import parse_args, gnn
-import numpy as np
 from GNN_implement import gnn
-path.append(r"./mynode2vec/src")
+path.append(r"./node2vec/src/")
+import numpy as np
 import networkx as nx
 from sklearn import metrics
-from mynode2vec import Graph
+import node2vec
 from gensim.models import Word2Vec
 from operator import itemgetter
 from tqdm import tqdm
 import pandas as pd
 from GNN_implement import gnn_save_model, gnn_save_model_No2
-
 
 def load_data(network_type):
     """
@@ -86,8 +70,7 @@ def learning_embedding(positive, negative, network_size, test_ratio, dimension, 
         A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
     line_graph = nx.line_graph(A)
     # node2vec
-    # G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
-    G = Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
     G.preprocess_transition_probs()
     walks = G.simulate_walks(num_walks=10, walk_length=80)
     walks = [list(map(str, walk)) for walk in walks]
@@ -129,8 +112,8 @@ def learning_embedding_at_node(positive, negative, network_size, test_ratio, dim
     if negative_injection:
         A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
     # node2vec
-    # G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
-    G = Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    G = node2vec.graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
+    # G = Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
     G.preprocess_transition_probs()
     walks = G.simulate_walks(num_walks=10, walk_length=80)
     walks = [list(map(str, walk)) for walk in walks]
@@ -571,7 +554,7 @@ def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate
     nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
 
     model = gnn_save_model.define_model(top_k, initial_feature_dimension, nodes_size_list_train, nodes_size_list_test, learning_rate,debug=False)
-    # gnn_save_model.train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, epoch)
+    gnn_save_model.train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, epoch)
 
     prediction = gnn_save_model.predict(model, X_test[0], A_tilde_test[0], D_inverse_test[0], nodes_size_list_test[0])
     print("Probability for prediction is: ", prediction[0])
