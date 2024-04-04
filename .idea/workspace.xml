@@ -4,38 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0dccabb6-c128-4582-9a12-d5087b78549f" name="Default" comment="first commit">
-      <change afterPath="$PROJECT_DIR$/GNN_implement/__init__..py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SEAL/__init__..py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SEAL/data/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SEAL/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SEAL/model/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SEAL/modelGCN.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SEAL/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/constant.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/node2vec/__init__.py" afterDir="false" />
+    <list default="true" id="0dccabb6-c128-4582-9a12-d5087b78549f" name="Default" comment="refactor code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GNN_implement/gnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/gnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GNN_implement/gnn_save_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/gnn_save_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GNN_implement/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/GNN_implement/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/main_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model-1000.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model-1000.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model-1000.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/performer.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/performer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/Celegans.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/PB.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/Router.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/USAir.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/Yeast.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/karate.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/raw_data/power.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/seal_link_predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/seal_link_predict.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/seal_link_predict_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/seal_link_predict_new.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -409,7 +379,23 @@
       <option name="project" value="LOCAL" />
       <updated>1712157120014</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="refactor code">
+      <option name="closed" value="true" />
+      <created>1712244114340</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1712244114340</updated>
+    </task>
+    <task id="LOCAL-00005" summary="refactor code">
+      <option name="closed" value="true" />
+      <created>1712244122628</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1712244122628</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -455,7 +441,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="update" />
     <MESSAGE value="first commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
+    <MESSAGE value="refactor code" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor code" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/hello.py">
