@@ -4,7 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0dccabb6-c128-4582-9a12-d5087b78549f" name="Default" comment="first commit" />
+    <list default="true" id="0dccabb6-c128-4582-9a12-d5087b78549f" name="Default" comment="first commit">
+      <change afterPath="$PROJECT_DIR$/GNN_implement/__init__..py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SEAL/__init__..py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SEAL/data/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SEAL/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SEAL/model/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SEAL/modelGCN.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SEAL/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/constant.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/node2vec/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GNN_implement/gnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/gnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GNN_implement/gnn_save_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/gnn_save_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GNN_implement/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/GNN_implement/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/checkpoint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/main_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model-1000.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model-1000.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model-1000.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/performer.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/performer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/Celegans.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/PB.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/Router.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/USAir.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/Yeast.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/karate.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/raw_data/power.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/seal_link_predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/seal_link_predict.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/seal_link_predict_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/seal_link_predict_new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/SEAL/utils.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -27,13 +59,21 @@
       </file>
     </leaf>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
         <entry key="$PROJECT_DIR$/LogisticRegression_Linkprediction" value="master" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/LogisticRegression_Linkprediction" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="IdeDocumentHistory">
@@ -102,13 +142,29 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;
+    &quot;git-widget-placeholder&quot;: &quot;GNN-develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/nhattrieu-machine/Documents/GNN-LinkPrediction/SEAL&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
   }
 }</component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/SEAL" />
+      <recent name="$PROJECT_DIR$/Logis" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/LogisticRegression_Linkprediction/data" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/Logis/utils" />
+      <recent name="$PROJECT_DIR$/Logis/model" />
+      <recent name="$PROJECT_DIR$/LogisticRegression_Linkprediction/utils" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main">
     <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -229,6 +285,29 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SEAL_implement" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="Tox" factoryName="Tox">
       <module name="SEAL_implement" />
       <option name="ENV_FILES" value="" />
@@ -278,8 +357,13 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.hello" />
+      <item itemvalue="Python.main" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.hello" />
         <item itemvalue="Python.hello" />
       </list>
@@ -317,7 +401,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712156834083</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="first commit">
+      <option name="closed" value="true" />
+      <created>1712157120014</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1712157120014</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -364,16 +456,6 @@
     <MESSAGE value="update" />
     <MESSAGE value="first commit" />
     <option name="LAST_COMMIT_MESSAGE" value="first commit" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/LogisticRegression_Linkprediction/dataset_preparation.py</url>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/hello.py">

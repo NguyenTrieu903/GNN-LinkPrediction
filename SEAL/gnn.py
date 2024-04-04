@@ -1,8 +1,9 @@
 import time
+
+import numpy as np
 import tensorflow as tf
-from load_raw_data import *
-from tqdm import tqdm
 from sklearn import metrics
+from tqdm import tqdm
 
 
 GRAPH_CONV_LAYER_CHANNEL = 32
@@ -44,8 +45,10 @@ def create_input(data, directed):
         D_inverse.append(np.linalg.inv(np.diag(np.sum(x, axis=1))))
     # get X
     X, initial_feature_channels = [], 0
+
     def convert_to_one_hot(y, C):
         return np.eye(C)[y.reshape(-1)]
+
     if data["vertex_tag"]:
         vertex_tag = data["vertex_tag"]
         initial_feature_channels = len(set(sum(vertex_tag, [])))
@@ -90,19 +93,19 @@ def split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list, rate=0.1):
     A_tilde_train, A_tilde_test = A_tilde[: training_set_size], A_tilde[training_set_size:]
     X_train, X_test = X[: training_set_size], X[training_set_size:]
     Y_train, Y_test = Y[: training_set_size], Y[training_set_size:]
-    nodes_size_list_train, nodes_size_list_test = nodes_size_list[: training_set_size], nodes_size_list[training_set_size:]
+    nodes_size_list_train, nodes_size_list_test = nodes_size_list[: training_set_size], nodes_size_list[
+                                                                                        training_set_size:]
     print("about train: positive examples(%d): %s, negative examples: %s."
           % (training_set_size, np.sum(Y_train == 1), np.sum(Y_train == 0)))
     print("about test: positive examples(%d): %s, negative examples: %s."
           % (test_set_size, np.sum(Y_test == 1), np.sum(Y_test == 0)))
     return D_inverse_train, D_inverse_test, A_tilde_train, A_tilde_test, X_train, X_test, Y_train, Y_test, \
-           nodes_size_list_train, nodes_size_list_test
+        nodes_size_list_train, nodes_size_list_test
 
 
 def train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train,
-        X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test,
-        top_k, initial_channels, learning_rate=0.00001, epoch=100, data_name="mutag", debug=False):
-
+          X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test,
+          top_k, initial_channels, learning_rate=0.00001, epoch=100, data_name="mutag", debug=False):
     # placeholder: Dung de dinh nghia cac placeholder trong mo hinh hoc may, la mot cach de cung cap du lieu cho mo hinh trong qua trinh dao tao cu the
     D_inverse_pl = tf.placeholder(dtype=tf.float32, shape=[None, None])
     A_tilde_pl = tf.placeholder(dtype=tf.float32, shape=[None, None])
@@ -113,9 +116,12 @@ def train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_trai
 
     # trainable parameters of graph convolution layer
     # tao cac bien co ten la graph_weight_1 voi cac gia tri ngau nhien cu the.Duoc su dung trong qua trinh khoi tao cac trong so cua mang no-ron 
-    graph_weight_1 = tf.Variable(tf.truncated_normal(shape=[initial_channels, GRAPH_CONV_LAYER_CHANNEL], stddev=0.1, dtype=tf.float32))
-    graph_weight_2 = tf.Variable(tf.truncated_normal(shape=[GRAPH_CONV_LAYER_CHANNEL, GRAPH_CONV_LAYER_CHANNEL], stddev=0.1, dtype=tf.float32))
-    graph_weight_3 = tf.Variable(tf.truncated_normal(shape=[GRAPH_CONV_LAYER_CHANNEL, GRAPH_CONV_LAYER_CHANNEL], stddev=0.1, dtype=tf.float32))
+    graph_weight_1 = tf.Variable(
+        tf.truncated_normal(shape=[initial_channels, GRAPH_CONV_LAYER_CHANNEL], stddev=0.1, dtype=tf.float32))
+    graph_weight_2 = tf.Variable(
+        tf.truncated_normal(shape=[GRAPH_CONV_LAYER_CHANNEL, GRAPH_CONV_LAYER_CHANNEL], stddev=0.1, dtype=tf.float32))
+    graph_weight_3 = tf.Variable(
+        tf.truncated_normal(shape=[GRAPH_CONV_LAYER_CHANNEL, GRAPH_CONV_LAYER_CHANNEL], stddev=0.1, dtype=tf.float32))
     graph_weight_4 = tf.Variable(tf.truncated_normal(shape=[GRAPH_CONV_LAYER_CHANNEL, 1], stddev=0.1, dtype=tf.float32))
 
     # GRAPH CONVOLUTION LAYER
@@ -163,26 +169,30 @@ def train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_trai
                                       lambda: tf.concat(axis=0,
                                                         values=[graph_conv_output_stored,
                                                                 tf.zeros(dtype=tf.float32,
-                                                                         shape=[threshold_k-node_size_pl,
-                                                                                GRAPH_CONV_LAYER_CHANNEL*3])]),
+                                                                         shape=[threshold_k - node_size_pl,
+                                                                                GRAPH_CONV_LAYER_CHANNEL * 3])]),
                                       lambda: tf.slice(graph_conv_output_stored, begin=[0, 0], size=[threshold_k, -1]))
 
     # FLATTEN LAYER
     # Su dung de bien doi tensor graph_conv_output_top_k thanh mot tensor graph_conv_output_flatten co hinh dang moi
-    graph_conv_output_flatten = tf.reshape(graph_conv_output_top_k, shape=[1, GRAPH_CONV_LAYER_CHANNEL*3*threshold_k, 1])
-    assert graph_conv_output_flatten.shape == [1, GRAPH_CONV_LAYER_CHANNEL*3*threshold_k, 1]
+    graph_conv_output_flatten = tf.reshape(graph_conv_output_top_k,
+                                           shape=[1, GRAPH_CONV_LAYER_CHANNEL * 3 * threshold_k, 1])
+    assert graph_conv_output_flatten.shape == [1, GRAPH_CONV_LAYER_CHANNEL * 3 * threshold_k, 1]
 
     # 1-D CONVOLUTION LAYER 1:
     # kernel = (filter_width, in_channel, out_channel)
     # Thuc hien phep tinh chap 1 chieu tren du lieu dau vao bang cach su dung bo lap conv1d_kernel_1
     # Tao mot bien conv1d_kernel_1 de luu tru bo loc cho phep tich chap mot chieu
-    conv1d_kernel_1 = tf.Variable(tf.truncated_normal(shape=[CONV1D_1_FILTER_WIDTH, 1, CONV1D_1_OUTPUT], stddev=0.1, dtype=tf.float32))
+    conv1d_kernel_1 = tf.Variable(
+        tf.truncated_normal(shape=[CONV1D_1_FILTER_WIDTH, 1, CONV1D_1_OUTPUT], stddev=0.1, dtype=tf.float32))
     # Su dung tf.nn.conv1d de thuc hien phep tich chap 1 chieu
     conv_1d_a = tf.nn.conv1d(graph_conv_output_flatten, conv1d_kernel_1, stride=CONV1D_1_FILTER_WIDTH, padding="VALID")
     assert conv_1d_a.shape == [1, threshold_k, CONV1D_1_OUTPUT]
 
     # 1-D CONVOLUTION LAYER 2:
-    conv1d_kernel_2 = tf.Variable(tf.truncated_normal(shape=[CONV1D_2_FILTER_WIDTH, CONV1D_1_OUTPUT, CONV1D_2_OUTPUT], stddev=0.1, dtype=tf.float32))
+    conv1d_kernel_2 = tf.Variable(
+        tf.truncated_normal(shape=[CONV1D_2_FILTER_WIDTH, CONV1D_1_OUTPUT, CONV1D_2_OUTPUT], stddev=0.1,
+                            dtype=tf.float32))
     conv_1d_b = tf.nn.conv1d(conv_1d_a, conv1d_kernel_2, stride=1, padding="VALID")
     assert conv_1d_b.shape == [1, threshold_k - CONV1D_2_FILTER_WIDTH + 1, CONV1D_2_OUTPUT]
     # Su dung de lam phang (flatten) dau ra cua mot lop convolutional 1D thanh mot vecto 
@@ -260,11 +270,13 @@ def train(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_trai
                     test_acc += 1
             test_acc = test_acc / test_data_size
             if debug:
-                mean_value, var_value, max_value, min_value = sess.run([var_mean, var_variance, var_max, var_min], feed_dict=feed_dict)
+                mean_value, var_value, max_value, min_value = sess.run([var_mean, var_variance, var_max, var_min],
+                                                                       feed_dict=feed_dict)
                 print("\t\tdebug: mean: %f, variance: %f, max: %f, min: %f." %
                       (mean_value, var_value, max_value, min_value))
             print("After %5s epoch, the loss is %f, training acc %f, test acc %f, auc is %f."
-                  % (epoch, loss_value, train_acc, test_acc, metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))))
+                  % (epoch, loss_value, train_acc, test_acc,
+                     metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))))
 
             # saver.save(sess, os.path.join(MODEL_SAVE_PATH, data_name, MODEL_SAVE_NAME), global_step)
         end_t = time.time()

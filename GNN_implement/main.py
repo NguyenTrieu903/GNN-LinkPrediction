@@ -1,6 +1,6 @@
 import argparse
 import pickle
-from gnn import create_input, split_train_test, train
+from SEAL.gnn import create_input, split_train_test, train
 import numpy as np
 
 

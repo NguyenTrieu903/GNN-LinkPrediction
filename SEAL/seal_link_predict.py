@@ -1,8 +1,7 @@
 from sys import path
-path.append(r'./GNN_implement/')
-from GNN_implement.main import parse_args, gnn
-from GNN_implement.gnn import split_train_test, train
-path.append(r"./node2vec/src/")
+path.append(r'../GNN_implement/')
+from SEAL.gnn import split_train_test, train
+path.append(r"../node2vec/src/")
 import numpy as np
 import networkx as nx
 from sklearn import metrics
@@ -24,7 +23,7 @@ def load_data(data_name, network_type):
     # positive = np.loadtxt(file_path, dtype=int, usecols=(0, 1))
 
     print("load data...")
-    file_path = "./raw_data/fb-pages-food/fb-pages-food.csv"
+    file_path = "../raw_data/fb-pages-food/fb-pages-food.csv"
     positive_df = pd.read_csv(file_path, delimiter=',', dtype=int)
     positive = positive_df.to_numpy()
 

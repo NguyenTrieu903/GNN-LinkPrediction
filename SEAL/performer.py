@@ -1,5 +1,5 @@
 import numpy as np
-import main
+from SEAL import main
 
 TIMES = 10
 

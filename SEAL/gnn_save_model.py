@@ -1,9 +1,14 @@
 import time
+
+import numpy as np
 import tensorflow as tf
-from load_raw_data import *
 from tqdm import tqdm
 from sklearn import metrics
-import modelGCN
+
+import constant
+from SEAL import modelGCN
+
+# import modelGCN
 
 
 GRAPH_CONV_LAYER_CHANNEL = 32
@@ -248,7 +253,7 @@ def train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_si
                         train_acc += 1
             train_acc = train_acc / train_data_size    
             print("After %5s epoch, training acc %f, the loss is %f." % (epoch, train_acc, loss_value))    
-        saver.save(sess, '/home/nhattrieu-machine/Documents/SEAL-for-link-prediction-master/model',global_step=1000)
+        saver.save(sess, constant.path_model_SEAL ,global_step=1000)
 
 def predict_test_data(model, X_test, D_inverse_test, A_tilde_test, Y_test, nodes_size_list_test):
     # D_inverse_pl = model.D_inverse_pl

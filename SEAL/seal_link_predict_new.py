@@ -1,31 +1,29 @@
 from sys import path
-path.append(r'./GNN_implement/')
-from GNN_implement.main import parse_args, gnn
-from GNN_implement import gnn
-path.append(r"./node2vec/src/")
+
+from SEAL import gnn_save_model
+from node2vec.src import node2vec
+from SEAL import gnn
+
 import numpy as np
 import networkx as nx
 from sklearn import metrics
-import node2vec
 from gensim.models import Word2Vec
 from operator import itemgetter
 from tqdm import tqdm
 import pandas as pd
-from GNN_implement import gnn_save_model, gnn_save_model_No2
-
+import constant
 def load_data(network_type):
     """
-    :param data_name: 
+    :param data_name:
     :param network_type: use 0 and 1 stands for undirected or directed graph, respectively
-    :return: 
+    :return:
     """
     # print("load data...")
     # file_path = "./raw_data/" + data_name + ".txt"
     # positive = np.loadtxt(file_path, dtype=int, usecols=(0, 1))
 
     print("load data...")
-    file_path = "./raw_data/git_web_ml/musae_git_edges.csv"
-    positive_df = pd.read_csv(file_path, delimiter=',', dtype=int)
+    positive_df = pd.read_csv(constant.path_edges, delimiter=',', dtype=int)
     positive = positive_df.to_numpy()
 
     # sample negative
@@ -50,11 +48,11 @@ def learning_embedding(positive, negative, network_size, test_ratio, dimension, 
     :param positive: ndarray, from 'load_data', all positive edges
     :param negative: ndarray, from 'load_data', all negative edges
     :param network_size: scalar, nodes size in the network
-    :param test_ratio: proportion of the test set 
+    :param test_ratio: proportion of the test set
     :param dimension: size of the node2vec
     :param network_type: directed or undirected
     :param negative_injection: add negative edges to learn word embedding
-    :return: 
+    :return:
     """
     print("learning embedding...")
     # used training data only
@@ -62,12 +60,14 @@ def learning_embedding(positive, negative, network_size, test_ratio, dimension, 
     train_posi, train_nega = positive[:-test_size], negative[:-test_size]
     # negative injection
     A = nx.Graph() if network_type == 0 else nx.DiGraph()
-    
-    # So if train_posi is an array containing the edges of the graph, 
+
+    # So if train_posi is an array containing the edges of the graph,
     # the line of code will add these edges to graph A and assign a weight of 1 to each edge.
-    A.add_weighted_edges_from(np.concatenate([train_posi, np.ones(shape=[train_posi.shape[0], 1], dtype=np.int8)], axis=1))
+    A.add_weighted_edges_from(
+        np.concatenate([train_posi, np.ones(shape=[train_posi.shape[0], 1], dtype=np.int8)], axis=1))
     if negative_injection:
-        A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
+        A.add_weighted_edges_from(
+            np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
     line_graph = nx.line_graph(A)
     # node2vec
     G = node2vec.Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
@@ -89,16 +89,17 @@ def learning_embedding(positive, negative, network_size, test_ratio, dimension, 
     return embedding_feature
 
 
-def learning_embedding_at_node(positive, negative, network_size, test_ratio, dimension, network_type, index, negative_injection=True):
+def learning_embedding_at_node(positive, negative, network_size, test_ratio, dimension, network_type, index,
+                               negative_injection=True):
     """
     :param positive: ndarray, from 'load_data', all positive edges
     :param negative: ndarray, from 'load_data', all negative edges
     :param network_size: scalar, nodes size in the network
-    :param test_ratio: proportion of the test set 
+    :param test_ratio: proportion of the test set
     :param dimension: size of the node2vec
     :param network_type: directed or undirected
     :param negative_injection: add negative edges to learn word embedding
-    :return: 
+    :return:
     """
     print("learning embedding...")
     # used training data only
@@ -106,11 +107,13 @@ def learning_embedding_at_node(positive, negative, network_size, test_ratio, dim
     train_posi, train_nega = positive[:-test_size], negative[:-test_size]
     # negative injection
     A = nx.Graph() if network_type == 0 else nx.DiGraph()
-    # So if train_posi is an array containing the edges of the graph, 
+    # So if train_posi is an array containing the edges of the graph,
     # the line of code will add these edges to graph A and assign a weight of 1 to each edge.
-    A.add_weighted_edges_from(np.concatenate([train_posi, np.ones(shape=[train_posi.shape[0], 1], dtype=np.int8)], axis=1))
+    A.add_weighted_edges_from(
+        np.concatenate([train_posi, np.ones(shape=[train_posi.shape[0], 1], dtype=np.int8)], axis=1))
     if negative_injection:
-        A.add_weighted_edges_from(np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
+        A.add_weighted_edges_from(
+            np.concatenate([train_nega, np.ones(shape=[train_nega.shape[0], 1], dtype=np.int8)], axis=1))
     # node2vec
     G = node2vec.graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
     # G = Graph(A, is_directed=False if network_type == 0 else True, p=1, q=1)
@@ -121,7 +124,7 @@ def learning_embedding_at_node(positive, negative, network_size, test_ratio, dim
     wv = model.wv
     embedding_feature, empty_indices, avg_feature = np.zeros([network_size, dimension]), [], 0
     for i in range(network_size):
-        print("i: ",i)
+        print("i: ", i)
         if str(i) in wv:
             embedding_feature[i] = wv.word_vec(str(i))
             print("embedding_feature[{}]: {}".format(i, embedding_feature[i]))
@@ -132,16 +135,17 @@ def learning_embedding_at_node(positive, negative, network_size, test_ratio, dim
     print("embedding feature shape: ", embedding_feature.shape)
     return embedding_feature
 
+
 def link2subgraph(positive, negative, nodes_size, test_ratio, hop, network_type, max_neighbors=100):
     """
     :param positive: ndarray, from 'load_data', all positive edges
     :param negative: ndarray, from 'load_data', all negative edges
     :param nodes_size: int, scalar, nodes size in the network
-    :param test_ratio: float, scalar, proportion of the test set 
+    :param test_ratio: float, scalar, proportion of the test set
     :param hop: option: 0, 1, 2, ..., or 'auto'
     :param network_type: directed or undirected
-    :param max_neighbors: 
-    :return: 
+    :param max_neighbors:
+    :return:
     """
     print("extract enclosing subgraph...")
     test_size = int(len(positive) * test_ratio)
@@ -169,11 +173,13 @@ def link2subgraph(positive, negative, nodes_size, test_ratio, hop, network_type,
     if hop == "auto":
         def cn():
             return np.matmul(A, A)
+
         def aa():
             A_ = A / np.log(A.sum(axis=1))
             A_[np.isnan(A_)] = 0
             A_[np.isinf(A_)] = 0
             return A.dot(A_)
+
         cn_scores, aa_scores = cn(), aa()
         cn_auc = calculate_auc(cn_scores, test_pos, test_neg)
         aa_auc = calculate_auc(aa_scores, test_pos, test_neg)
@@ -205,7 +211,8 @@ def link2subgraph(positive, negative, nodes_size, test_ratio, hop, network_type,
     assert len(graphs_adj) == len(vertex_tags) == len(node_size_list)
     # dung de tao ma tran nhan cho cac canh trong do thi. tao thanh ma tran co 1 cot va so hang la tong so cac canh trong do thi.
     # Ket qua la mot ma tran nhan, trong do moi hang dai dien cho 1 canh trong do thi va mot nhan tuong ung.
-    labels = np.concatenate([np.zeros(len(negative), dtype=np.uint8), np.ones(len(positive), dtype=np.uint8)]).reshape(-1, 1)
+    labels = np.concatenate([np.zeros(len(negative), dtype=np.uint8), np.ones(len(positive), dtype=np.uint8)]).reshape(
+        -1, 1)
 
     # vertex_tags_set = list(set(sum(vertex_tags, [])))
     vertex_tags_set = set()
@@ -214,7 +221,7 @@ def link2subgraph(positive, negative, nodes_size, test_ratio, hop, network_type,
     vertex_tags_set = list(vertex_tags_set)
     tags_size = len(vertex_tags_set)
     print("tight the vertices tags.")
-    # kiem tra xem tat ca cac phan tu trong vertex_tags_set co tao thanh mot chuoi so nguyen lien tuc tu 0 den len(vertex_tags_set-1) hay khong. 
+    # kiem tra xem tat ca cac phan tu trong vertex_tags_set co tao thanh mot chuoi so nguyen lien tuc tu 0 den len(vertex_tags_set-1) hay khong.
     # Dieu nay dung de dam bao tinh day du va dung dan cua cac nhan duoc gan cho cac nut trong do thi.
     if set(range(len(vertex_tags_set))) != set(vertex_tags_set):
         vertex_map = dict([(x, vertex_tags_set.index(x)) for x in vertex_tags_set])
@@ -223,16 +230,17 @@ def link2subgraph(positive, negative, nodes_size, test_ratio, hop, network_type,
     return graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, tags_size
 
 
-def link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ratio, hop, network_type, max_neighbors=100):
+def link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ratio, hop, network_type,
+                              max_neighbors=100):
     """
     :param positive: ndarray, from 'load_data', all positive edges
     :param negative: ndarray, from 'load_data', all negative edges
     :param nodes_size: int, scalar, nodes size in the network
-    :param test_ratio: float, scalar, proportion of the test set 
+    :param test_ratio: float, scalar, proportion of the test set
     :param hop: option: 0, 1, 2, ..., or 'auto'
     :param network_type: directed or undirected
-    :param max_neighbors: 
-    :return: 
+    :param max_neighbors:
+    :return:
     """
     print("extract enclosing subgraph...")
     test_size = int(len(positive) * test_ratio)
@@ -260,11 +268,13 @@ def link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ra
     if hop == "auto":
         def cn():
             return np.matmul(A, A)
+
         def aa():
             A_ = A / np.log(A.sum(axis=1))
             A_[np.isnan(A_)] = 0
             A_[np.isinf(A_)] = 0
             return A.dot(A_)
+
         cn_scores, aa_scores = cn(), aa()
         cn_auc = calculate_auc(cn_scores, test_pos, test_neg)
         aa_auc = calculate_auc(aa_scores, test_pos, test_neg)
@@ -292,12 +302,13 @@ def link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ra
     sub_graphs_nodes.append(sub_nodes)
     # for graph_label, data in enumerate([negative, positive]):
     #     print("for %s. " % "negative" if graph_label == 0 else "positive")
-        # for node_pair in tqdm(data):
-        
+    # for node_pair in tqdm(data):
+
     # assert len(graphs_adj) == len(vertex_tags) == len(node_size_list)
     # dung de tao ma tran nhan cho cac canh trong do thi. tao thanh ma tran co 1 cot va so hang la tong so cac canh trong do thi.
     # Ket qua la mot ma tran nhan, trong do moi hang dai dien cho 1 canh trong do thi va mot nhan tuong ung.
-    labels = np.concatenate([np.zeros(len(negative), dtype=np.uint8), np.ones(len(positive), dtype=np.uint8)]).reshape(-1, 1)
+    labels = np.concatenate([np.zeros(len(negative), dtype=np.uint8), np.ones(len(positive), dtype=np.uint8)]).reshape(
+        -1, 1)
 
     # vertex_tags_set = list(set(sum(vertex_tags, [])))
     vertex_tags_set = set()
@@ -306,13 +317,14 @@ def link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ra
     vertex_tags_set = list(vertex_tags_set)
     tags_size = len(vertex_tags_set)
     print("tight the vertices tags.")
-    # kiem tra xem tat ca cac phan tu trong vertex_tags_set co tao thanh mot chuoi so nguyen lien tuc tu 0 den len(vertex_tags_set-1) hay khong. 
+    # kiem tra xem tat ca cac phan tu trong vertex_tags_set co tao thanh mot chuoi so nguyen lien tuc tu 0 den len(vertex_tags_set-1) hay khong.
     # Dieu nay dung de dam bao tinh day du va dung dan cua cac nhan duoc gan cho cac nut trong do thi.
     if set(range(len(vertex_tags_set))) != set(vertex_tags_set):
         vertex_map = dict([(x, vertex_tags_set.index(x)) for x in vertex_tags_set])
         for index, graph_tag in tqdm(enumerate(vertex_tags)):
             vertex_tags[index] = list(itemgetter(*graph_tag)(vertex_map))
     return graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, tags_size
+
 
 def extract_subgraph(node_pair, G, A, hop, network_type, max_neighbors):
     """
@@ -321,8 +333,8 @@ def extract_subgraph(node_pair, G, A, hop, network_type, max_neighbors):
     :param A:  equivalent to the G, adj matrix of G
     :param hop:
     :param network_type:
-    :param max_neighbors: 
-    :return: 
+    :param max_neighbors:
+    :return:
         sub_graph_nodes: use for select the embedding feature
         sub_graph_adj: adjacent matrix of the enclosing sub-graph
         vertex_tag: node type information from the labeling algorithm
@@ -352,6 +364,7 @@ def extract_subgraph(node_pair, G, A, hop, network_type, max_neighbors):
     vertex_tag = node_labeling(sub_graph_adj, network_type)
     return sub_graph_nodes, sub_graph_adj, vertex_tag
 
+
 def extract_subgraph_at_node(node, G, A, hop, network_type, max_neighbors):
     """
     :param node:  vertex to extract subgraph around
@@ -360,7 +373,7 @@ def extract_subgraph_at_node(node, G, A, hop, network_type, max_neighbors):
     :param hop: number of hops to extend the subgraph
     :param network_type: type of the network (directed or undirected)
     :param max_neighbors: maximum number of neighbors to include in the subgraph
-    :return: 
+    :return:
         sub_graph_nodes: nodes in the extracted subgraph
         sub_graph_adj: adjacency matrix of the subgraph
         vertex_tag: node type information from the labeling algorithm
@@ -380,6 +393,7 @@ def extract_subgraph_at_node(node, G, A, hop, network_type, max_neighbors):
     # labeling (coloring/tagging)
     vertex_tag = node_labeling(sub_graph_adj, network_type)
     return list(sub_graph_nodes), sub_graph_adj, vertex_tag
+
 
 # Ham dung de gan nhan cho cac nut trong do thi dua tren mot thuat toan goi la node labeling
 def node_labeling(graph_adj, network_type):
@@ -424,15 +438,16 @@ def create_input_for_gnn_fly(graphs_adj, labels, vertex_tags, node_size_list, su
     for x in graphs_adj:
         # su dung de tinh ma tran nghich dao cua ma tran duong cheo. np.sum(x, axis=1) -> tinh tong moi hang cua ma tran
         # np.diag -> tao mot ma tran duong cheo tu mang bang cach su dung np.diag()
-        # np.linalg.inv -> tinh ma tran nghich dao cua ma tran duong cheo nay. 
+        # np.linalg.inv -> tinh ma tran nghich dao cua ma tran duong cheo nay.
         D_inverse.append(np.linalg.inv(np.diag(np.sum(x, axis=1))))
     # 4 - prepare X
     X, initial_feature_channels = [], 0
 
-    # Target: chuyen doi mot mang cac nhan lop thanh mot dang ma hoa one-hot. Một ma trận one-hot với mỗi hàng biểu diễn một nhãn lớp, 
+    # Target: chuyen doi mot mang cac nhan lop thanh mot dang ma hoa one-hot. Một ma trận one-hot với mỗi hàng biểu diễn một nhãn lớp,
     # trong đó chỉ có một phần tử bằng 1 và tất cả các phần tử khác bằng 0
     def convert_to_one_hot(y, C):
         return np.eye(C, dtype=np.uint8)[y.reshape(-1)]
+
     # vertex_tags la mot list cac nhan cac dinh trong do thi. Neu khac None thi chay qua cac vertex_tag va one_hot chung.
     if vertex_tags is not None:
         initial_feature_channels = tags_size
@@ -448,7 +463,7 @@ def create_input_for_gnn_fly(graphs_adj, labels, vertex_tags, node_size_list, su
             X.append(np.divide(degree_total, np.sum(degree_total)).reshape(-1, 1))
         initial_feature_channels = 1
     X = np.array(X)
-    # doan code xay dung cac embedding features cho cac dinh trong do thi bang cach ket hop cac dac trung hien co voi cac dac trung nhung neu chung 
+    # doan code xay dung cac embedding features cho cac dinh trong do thi bang cach ket hop cac dac trung hien co voi cac dac trung nhung neu chung
     # co san.
     if embedding_feature is not None:
         print("embedding feature has considered")
@@ -458,7 +473,7 @@ def create_input_for_gnn_fly(graphs_adj, labels, vertex_tags, node_size_list, su
             sub_graph_emb.append(embedding_feature[sub_nodes])
         for i in range(len(X)):
             X[i] = np.concatenate([X[i], sub_graph_emb[i]], axis=1)
-        # so luong kenh dac trung ban dau duoc cap nhat thanh so luong kenh dac trung dau tien trong X. 
+        # so luong kenh dac trung ban dau duoc cap nhat thanh so luong kenh dac trung dau tien trong X.
         initial_feature_channels = len(X[0][0])
     if explicit_feature is not None:
         initial_feature_channels = len(X[0][0])
@@ -468,7 +483,7 @@ def create_input_for_gnn_fly(graphs_adj, labels, vertex_tags, node_size_list, su
 
 
 def create_input_for_gnn_fly_node_pair(graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes,
-                             embedding_feature, explicit_feature, tags_size):
+                                       embedding_feature, explicit_feature, tags_size):
     print("create input for gnn on fly, (skipping I/O operation)")
     # graphs, nodes_size_list, labels = data["graphs"], data["nodes_size_list"], data["labels"]
 
@@ -487,15 +502,16 @@ def create_input_for_gnn_fly_node_pair(graphs_adj, labels, vertex_tags, node_siz
     for x in graphs_adj:
         # su dung de tinh ma tran nghich dao cua ma tran duong cheo. np.sum(x, axis=1) -> tinh tong moi hang cua ma tran
         # np.diag -> tao mot ma tran duong cheo tu mang bang cach su dung np.diag()
-        # np.linalg.inv -> tinh ma tran nghich dao cua ma tran duong cheo nay. 
+        # np.linalg.inv -> tinh ma tran nghich dao cua ma tran duong cheo nay.
         D_inverse.append(np.linalg.inv(np.diag(np.sum(x, axis=1))))
     # 4 - prepare X
     X, initial_feature_channels = [], 0
 
-    # Target: chuyen doi mot mang cac nhan lop thanh mot dang ma hoa one-hot. Một ma trận one-hot với mỗi hàng biểu diễn một nhãn lớp, 
+    # Target: chuyen doi mot mang cac nhan lop thanh mot dang ma hoa one-hot. Một ma trận one-hot với mỗi hàng biểu diễn một nhãn lớp,
     # trong đó chỉ có một phần tử bằng 1 và tất cả các phần tử khác bằng 0
     def convert_to_one_hot(y, C):
         return np.eye(C, dtype=np.uint8)[y.reshape(-1)]
+
     # vertex_tags la mot list cac nhan cac dinh trong do thi. Neu khac None thi chay qua cac vertex_tag va one_hot chung.
     if vertex_tags is not None:
         initial_feature_channels = tags_size
@@ -511,7 +527,7 @@ def create_input_for_gnn_fly_node_pair(graphs_adj, labels, vertex_tags, node_siz
             X.append(np.divide(degree_total, np.sum(degree_total)).reshape(-1, 1))
         initial_feature_channels = 1
     X = np.array(X)
-    # doan code xay dung cac embedding features cho cac dinh trong do thi bang cach ket hop cac dac trung hien co voi cac dac trung nhung neu chung 
+    # doan code xay dung cac embedding features cho cac dinh trong do thi bang cach ket hop cac dac trung hien co voi cac dac trung nhung neu chung
     # co san.
     if embedding_feature is not None:
         # print("embedding feature has considered")
@@ -521,14 +537,14 @@ def create_input_for_gnn_fly_node_pair(graphs_adj, labels, vertex_tags, node_siz
         #     sub_graph_emb.append(embedding_feature[sub_nodes])
         # for i in range(len(X)):
         #     X[i] = np.concatenate([X[i], sub_graph_emb[i]], axis=1)
-        # # so luong kenh dac trung ban dau duoc cap nhat thanh so luong kenh dac trung dau tien trong X. 
+        # # so luong kenh dac trung ban dau duoc cap nhat thanh so luong kenh dac trung dau tien trong X.
         # initial_feature_channels = len(X[0][0])
         print("embedding feature has been considered")
         print(len(sub_graphs_nodes))
         # Build embedding for the node pair
         node1_emb = embedding_feature[sub_graphs_nodes[0]]
         node2_emb = embedding_feature[sub_graphs_nodes[1]]
-        
+
         # Concatenate node embeddings with node features
         X_node1 = np.concatenate([X[0], node1_emb], axis=1)
         X_node2 = np.concatenate([X[1], node2_emb], axis=1)
@@ -542,7 +558,8 @@ def create_input_for_gnn_fly_node_pair(graphs_adj, labels, vertex_tags, node_siz
     print("so, initial feature channels: ", initial_feature_channels)
     return np.array(D_inverse), graphs_adj, Y, X, node_size_list, initial_feature_channels  # ps, graph_adj is A_title
 
-def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate, top_k=60, epoch=100):
+
+def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate, top_k=60, epoch=10):
     positive, negative, nodes_size = load_data(is_directed)
     embedding_feature = learning_embedding(positive, negative, nodes_size, test_ratio, dimension, is_directed)
     graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, tags_size = \
@@ -551,17 +568,18 @@ def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate
     D_inverse, A_tilde, Y, X, nodes_size_list, initial_feature_dimension = create_input_for_gnn_fly(
         graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, embedding_feature, None, tags_size)
     D_inverse_train, D_inverse_test, A_tilde_train, A_tilde_test, X_train, X_test, Y_train, Y_test, \
-    nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
+        nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
 
-    model = gnn_save_model.define_model(top_k, initial_feature_dimension, nodes_size_list_train, nodes_size_list_test, learning_rate,debug=False)
+    model = gnn_save_model.define_model(top_k, initial_feature_dimension, nodes_size_list_train, nodes_size_list_test,
+                                        learning_rate, debug=False)
     gnn_save_model.train_demo(model, X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, epoch)
 
-    prediction = gnn_save_model.predict(model, X_test[0], A_tilde_test[0], D_inverse_test[0], nodes_size_list_test[0])
-    print("Probability for prediction is: ", prediction[0])
+    # prediction = gnn_save_model.predict(model, X_test[0], A_tilde_test[0], D_inverse_test[0], nodes_size_list_test[0])
+    # print("Probability for prediction is: ", prediction[0])
     # auc = metrics.roc_auc_score(y_true=np.squeeze(Y_test), y_score=np.squeeze(scores))
     # print("auc: %f" % auc)
     # print("test_acc: %f" % test_acc)
-    
+
     # gnn_save_model_No2.train_demo(X_train, D_inverse_train, A_tilde_train, Y_train, nodes_size_list_train, nodes_size_list_test, initial_feature_dimension, learning_rate, epoch, top_k, debug=False)
 
     # # origin
@@ -575,12 +593,14 @@ def classifier(data_name, is_directed, test_ratio, dimension, hop, learning_rate
     # print("auc: %f" % auc)
     # return auc
 
-def classifier_for_node_pair(node_pair, data_name, is_directed, test_ratio, dimension, hop, learning_rate, top_k=60, epoch=100):
+
+def classifier_for_node_pair(node_pair, data_name, is_directed, test_ratio, dimension, hop, learning_rate, top_k=60,
+                             epoch=100):
     positive, negative, nodes_size = load_data(data_name, is_directed)
     embedding_feature = learning_embedding(positive, negative, nodes_size, test_ratio, dimension, is_directed)
     graphs_adj, labels, vertex_tags, node_size_list, sub_graphs_nodes, tags_size = \
         link2subgraph_at_one_node(node_pair, positive, negative, nodes_size, test_ratio, hop, is_directed)
-    print("link2subgraph_at_one_node: ",sub_graphs_nodes)
+    print("link2subgraph_at_one_node: ", sub_graphs_nodes)
     # Find the index of the node pair in the subgraphs nodes list
     # print(len(sub_graphs_nodes[1]))
     # pair_index = sub_graphs_nodes.index(node_pair)
@@ -599,7 +619,7 @@ def classifier_for_node_pair(node_pair, data_name, is_directed, test_ratio, dime
     # D_inverse, A_tilde, Y, X, nodes_size_list, initial_feature_dimension = create_input_for_gnn_fly(
     #     [specific_graph_adj], [specific_label], [specific_vertex_tags], [specific_node_size], [node_pair],
     #     specific_embedding_feature, None, tags_size)
-    
+
     # # Split data into train and test sets (you might want to adjust this if needed)
     # D_inverse_train, D_inverse_test, A_tilde_train, A_tilde_test, X_train, X_test, Y_train, Y_test, \
     # nodes_size_list_train, nodes_size_list_test = gnn.split_train_test(D_inverse, A_tilde, X, Y, nodes_size_list)
