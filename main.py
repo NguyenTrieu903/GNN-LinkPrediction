@@ -1,5 +1,5 @@
 from LogisticRegression_Linkprediction.model.link_prediction import link_prediction_with_logistic
-from SEAL import main_test
+from SEAL.operators.seal_link_predict import execute
 import warnings
 warnings.filterwarnings("ignore")
 import argparse
@@ -14,6 +14,6 @@ if __name__ == "__main__":
     if args.model == 'Logistic':
         link_prediction_with_logistic()
     if args.model == 'SEAL':
-        main_test.seal_for_link_predict()
+        execute(0, 0.1, 128, "auto",0.00001)
     if args.model == 'GNN':
         pass

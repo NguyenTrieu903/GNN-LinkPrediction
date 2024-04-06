@@ -8,11 +8,11 @@ import constant
 def load_data():
     # load nodes details
     print("Load data...")
-    with open(constant.path_nodes, "rb") as f:
+    with open(constant.PATH_NODES, "rb") as f:
         fb_nodes = f.read().splitlines() 
 
     # load edges (or links)
-    with open(constant.path_edges) as f:
+    with open(constant.PATH_EDGES) as f:
         fb_links = f.read().splitlines() 
 
     print("Capture nodes in 2 separate lists...")
