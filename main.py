@@ -6,7 +6,8 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Link prediction with GNN.")
-    parser.add_argument("--model", type=str, help="model name.", default="SEAL")
+    #parser.add_argument("--model", type=str, help="model name.", default="SEAL")
+    parser.add_argument("--model", type=str, help="model name.", default="Logistic")
     return parser.parse_args()
 
 if __name__ == "__main__":

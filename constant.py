@@ -1,5 +1,6 @@
 PATH_NODES = "raw_data/fb-pages-food/fb-pages-food.nodes"
 PATH_EDGES = "raw_data/fb-pages-food/fb-pages-food.edges"
-MODEL_SAVE_PATH = "/home/nhattrieu-machine/Documents/GNN-LinkPrediction/SEAL/model/model"
+#MODEL_SAVE_PATH = "/home/nhattrieu-machine/Documents/GNN-LinkPrediction/SEAL/model/model"
+MODEL_SAVE_PATH = "./SEAL/model/model"
 MODEL_READ_PATH = "SEAL/model/model-1000.meta"
 CHECKPOINT_MODEL = "SEAL/model"
